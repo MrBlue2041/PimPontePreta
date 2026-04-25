@@ -1,1 +1,3 @@
-# pim1
+# PIM 1
+
+Sistema sócio-torcedor
