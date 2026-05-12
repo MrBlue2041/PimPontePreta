@@ -1,15 +1,18 @@
 import json
 
-menu_all = ["PIM", "Cadastro", "Login", "Sair", "Pagina Inicial", "Comprar Ingressos", "Meus Ingressos"]
+menu_all = ["PIM", "Cadastro", "Login", "Sair", "Pagina Inicial", "Comprar Ingressos", "Meus Ingressos", "Seja Sócio", "Sair"]
 
-tentativas_acesso = 0
+tentativas_login = 0
 menu_atual = 0
+
+def limparChat():
+    print("\n" * 40)
 
 def createMenu(text, inicio, final):
     global menu_atual
     
     print(f"{'=' * 20} [{menu_all[menu_atual]}] {'=' * 20}")
-    for menu in menu_all[1:3]:
+    for menu in menu_all[inicio:final]:
         print(f"[{menu_all.index(menu)}] {menu}")
     print("=" * 40)
     try:
@@ -17,19 +20,43 @@ def createMenu(text, inicio, final):
 
         if (select_menu >= inicio and select_menu < final):
             menu_atual = select_menu
-            print("\n" * 40)
+            limparChat()
             print(f"{'=' * 20} [{menu_all[menu_atual]}] {'=' * 20}")
         else:
-            print("\n" * 40)
+            limparChat()
             print("Por favor digite um numero valido ['1' ou '2']")
 
     except:
-        print("\n" * 40)
+        limparChat()
         print("Por favor digite apenas numeros.")
 
 def createAcesso(login):
+    global menu_atual
+    
     if login == True:
-        return print("loginnn")
+        login_etapa = 0
+        
+        while True:
+            match login_etapa:
+                case 0:
+                    cpf = input("Digite seu CPF: ")
+
+                    if len(cpf) == 11 and cpf != None:
+                        if buscarCPF(cpf):
+                            login_etapa += 1
+                        else:
+                            print("Erro: Esse CPF nao esta cadastrado.")
+                    else:
+                        print("Erro: CPF invalido.")
+                case 1: 
+                    senha = input("Digite sua senha: ")
+
+                    if buscarSenha(senha, cpf):
+                        menu_atual = 4
+                        break
+                    else:
+                        login_etapa = 1
+            
     else:
         cadastro_etapa = 0
         
@@ -125,7 +152,7 @@ def buscarEmail(email):
 
     return False
 
-def buscarCPF(email):
+def buscarCPF(cpf):
 
     try:
         with open("usuarios.json", "r") as arquivo:
@@ -136,7 +163,23 @@ def buscarCPF(email):
 
     for usuario in usuarios:
 
-        if usuario["CPF"] == email:
+        if usuario["cpf"] == cpf:
+            return True
+
+    return False
+
+def buscarSenha(senha, cpf):
+
+    try:
+        with open("usuarios.json", "r") as arquivo:
+            usuarios = json.load(arquivo)
+
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+    for usuario in usuarios:
+
+        if usuario["senha"] == senha and usuario["cpf"] == cpf:
             return True
 
     return False
@@ -145,12 +188,14 @@ def buscarCPF(email):
 while menu_atual != -1:
     match(menu_atual):
         case 0:
-            createMenu("Digite o menu em que voce deseja ir: ", 1, 3)
+            createMenu("Digite o menu em que voce deseja ir: ", 1, 4)
             
         case 1:
             createAcesso(False)
-            break
         case 2:
             createAcesso(True)
+        case 3:
             break
+        case 4:
+            createMenu("Digite o menu em que voce deseja ir: ", 5, 9)
             
