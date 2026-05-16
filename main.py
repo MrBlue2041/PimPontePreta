@@ -402,6 +402,9 @@ def buscarSetorPorId(jogo, id_setor):
 
     return None
 
+def calcularValorIngresso(valor, desconto):
+    return valor - (valor * desconto / 100)
+
 def createCompraIngresso():
     global Account
     global menu_atual
@@ -483,7 +486,7 @@ def createCompraIngresso():
 
         valor_original = setor["valor"]
         valor_desconto = valor_original * desconto / 100
-        valor_final = valor_original - valor_desconto
+        valor_final = calcularValorIngresso(valor_original, valor_desconto)
 
         limparChat()
 
@@ -512,7 +515,8 @@ def createCompraIngresso():
                 "tipo": setor["tipo"],
                 "valor_original": valor_original,
                 "desconto": desconto,
-                "valor_pago": valor_final
+                "valor_pago": valor_final,
+                "validado": False
             }
 
             if "ingressos" not in Account:
@@ -523,10 +527,100 @@ def createCompraIngresso():
 
             limparChat()
             print("Ingresso comprado com sucesso!")
+            mostrarTicket(ingresso)
 
         else:
             limparChat()
             print("Compra cancelada.")
+
+        menu_atual = 4
+
+    except ValueError:
+        limparChat()
+        print("Digite apenas numeros.")
+        menu_atual = 4
+
+def mostrarTicket(ingresso):
+    status = "Validado" if ingresso.get("validado") == True else "Nao validado"
+
+    print("-" * 40)
+    print(f"Jogo: {ingresso['jogo']}")
+    print(f"Data: {ingresso['data']} às {ingresso['horario']}")
+    print(f"Estádio: {ingresso['estadio']}")
+    print(f"Setor: {ingresso['setor']}")
+    print(f"Tipo: {ingresso['tipo']}")
+    print(f"Valor pago: R$ {ingresso['valor_pago']:.2f}")
+    print(f"Status: {status}")
+    print("-" * 40)
+    
+def createMeusIngressos():
+    global Account
+    global menu_atual
+
+    if len(Account) == 0:
+        print("Erro: voce precisa estar logado.")
+        menu_atual = 0
+        return
+
+    if "ingressos" not in Account or len(Account["ingressos"]) == 0:
+        print("Voce ainda nao possui ingressos.")
+        menu_atual = 4
+        return
+
+    print(f"{'=' * 20} [Meus Ingressos] {'=' * 20}")
+
+    index = 0
+
+    for ingresso in Account["ingressos"]:
+        print(f"[{index + 1}]")
+        mostrarTicket(ingresso)
+
+        index += 1
+
+    print("[0] Voltar")
+    print("=" * 40)
+
+    try:
+        select_ingresso = int(input("Digite o numero do ingresso para validar entrada: "))
+
+        if(select_ingresso == 0):
+            limparChat()
+            menu_atual = 4
+            return
+
+        index_ingresso = select_ingresso - 1
+
+        if(index_ingresso < 0 or index_ingresso >= len(Account["ingressos"])):
+            limparChat()
+            print("Erro: Ingresso invalido.")
+            menu_atual = 4
+            return
+
+        ingresso = Account["ingressos"][index_ingresso]
+
+        if(ingresso.get("validado") == True):
+            limparChat()
+            print("Erro: Este ingresso ja foi validado anteriormente.")
+            menu_atual = 4
+            return
+
+        print(f"{'=' * 20} [Validar Entrada] {'=' * 20}")
+        print(f"Ingresso: {ingresso['jogo']}")
+        print(f"Setor: {ingresso['setor']}")
+        print(f"Data: {ingresso['data']} às {ingresso['horario']}")
+        print("=" * 40)
+
+        confirmar = input("Confirmar validacao de entrada? [s/n]: ").lower()
+
+        if(confirmar == "s"):
+            Account["ingressos"][index_ingresso]["validado"] = True
+            salvarContaAtualizada()
+
+            limparChat()
+            print("Entrada validada com sucesso!")
+        else:
+            limparChat()
+            print("Validacao cancelada.")
 
         menu_atual = 4
 
@@ -547,7 +641,7 @@ while menu_atual != -1:
             createAcesso(True)
 
         case 3:
-            break
+            sairSistema()
 
         case 4:
             createMenu("Digite o menu em que voce deseja ir: ", 5, 9)
@@ -555,12 +649,10 @@ while menu_atual != -1:
         case 5:
             limparChat()
             createCompraIngresso()
-            menu_atual = 4
 
         case 6:
             limparChat()
-            print("Sistema de meus ingressos ainda nao implementado.")
-            menu_atual = 4
+            createMeusIngressos()
 
         case 7:
             createMenuSocios()
