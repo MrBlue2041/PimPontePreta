@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "adversario": "Testee",
+        "data": "20/06/2026",
+        "horario": "19:00",
+        "estadio": "Estádio Moisés Lucarelli",
+        "setores": [
+            {
+                "id": 1,
+                "nome": "Arquibancada",
+                "tipo": "Setor Mandante",
+                "valor": 60.0
+            },
+            {
+                "id": 2,
+                "nome": "Arquibancada Visitante",
+                "tipo": "Setor Visitante",
+                "valor": 60.0
+            },
+            {
+                "id": 3,
+                "nome": "Vip Ponte Preta",
+                "tipo": "Setor Camarote",
+                "valor": 60.0
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "adversario": "Testee",
+        "data": "20/06/2026",
+        "horario": "19:00",
+        "estadio": "Estádio Moisés Lucarelli",
+        "setores": [
+            {
+                "id": 1,
+                "nome": "Arquibancada",
+                "tipo": "Setor Mandante",
+                "valor": 60.0
+            },
+            {
+                "id": 2,
+                "nome": "Arquibancada Visitante",
+                "tipo": "Setor Visitante",
+                "valor": 60.0
+            },
+            {
+                "id": 3,
+                "nome": "Vip Ponte Preta",
+                "tipo": "Setor Camarote",
+                "valor": 60.0
+            }
+        ]
+    }
+]

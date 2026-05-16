@@ -1,8 +1,19 @@
 import json
 
 CAMINHO_USUARIOS = "dados/usuarios.json"
+CAMINHO_JOGOS = "dados/jogos.json"
 
-menus = ["PIM", "Cadastro", "Login", "Sair", "Pagina Inicial", "Comprar Ingressos", "Meus Ingressos", "Seja Sócio", "Sair"]
+menus = [
+    "PONTE PRETA",
+    "Cadastro",
+    "Login",
+    "Sair",
+    "Pagina Inicial",
+    "Comprar Ingressos",
+    "Meus Ingressos",
+    "Seja Sócio",
+    "Sair"
+]
 
 socios = {
     0: {"nome": "Nao socio", "desconto": 0, "valor": 0},
@@ -13,8 +24,6 @@ socios = {
 }
 
 Account = {}
-
-tentativas_login = 0
 menu_atual = 0
 
 
@@ -49,15 +58,40 @@ def salvarContaAtualizada():
     return False
 
 
+def mostrarPlanoAtual():
+    if len(Account) == 0:
+        return
+
+    plano_id = Account["socio"]
+    plano = socios[plano_id]
+
+    print(f"Plano atual: {plano['nome']}")
+    print(f"Desconto: {plano['desconto']}%")
+
+    if plano_id != 0:
+        print(f"Mensalidade paga: {'Sim' if Account['mensalidade_paga'] else 'Não'}")
+
+    print()
+
+
+def sairSistema():
+    global Account
+    global menu_atual
+
+    Account = {}
+    menu_atual = 0
+    limparChat()
+    print("Sua sessao foi terminada com sucesso!")
+
+
 def createMenu(text, inicio, final):
     global menu_atual
-    global Account
 
     print(f"{'=' * 20} [{menus[menu_atual]}] {'=' * 20}")
 
-    if menu_atual == 4:
-        if len(Account) != 0:
-            print(f"\nOlá Sr(a) {Account['nome']}, seja bem vindo Ponte Pretano.\n")
+    if menu_atual == 4 and len(Account) != 0:
+        print(f"\nOlá Sr(a) {Account['nome']}, seja bem vindo Ponte Pretano.\n")
+        mostrarPlanoAtual()
 
     for i in range(inicio, final):
         print(f"[{i}] {menus[i]}")
@@ -67,7 +101,7 @@ def createMenu(text, inicio, final):
     try:
         select_menu = int(input(text))
 
-        if select_menu >= inicio and select_menu < final:
+        if inicio <= select_menu < final:
             menu_atual = select_menu
             limparChat()
         else:
@@ -83,7 +117,7 @@ def createAcesso(login):
     global menu_atual
     global Account
 
-    if login == True:
+    if login:
         login_etapa = 0
 
         while True:
@@ -109,7 +143,7 @@ def createAcesso(login):
                             print("Erro: Nao foi possivel carregar a conta, tente novamente.")
                         else:
                             if Account["mensalidade_paga"] == False:
-                                print("Erro: Acesso negado, voce deve pagar sua mensalidade que esta em atraso")
+                                print("Erro: Acesso negado, voce deve pagar sua mensalidade que esta em atraso.")
                                 return
 
                             menu_atual = 4
@@ -247,35 +281,80 @@ def carregarConta(cpf, senha):
 def createMenuSocios():
     global menu_atual
 
-    if len(Account) != 0:
-        print(f"{'=' * 20} [{menus[menu_atual]}] {'=' * 20}")
+    if len(Account) == 0:
+        print("Erro: voce precisa estar logado.")
+        menu_atual = 0
+        return
 
-        for index, socio in list(socios.items())[1:]:
-            if index == 1:
-                print(f"[{index}] {socio['nome']} - {socio['valor']}")
-            else:
-                print(f"[{index}] {socio['nome']} - R$ {socio['valor']}")
+    print(f"{'=' * 20} [{menus[menu_atual]}] {'=' * 20}")
 
-        print("=" * 40)
+    mostrarPlanoAtual()
 
-        try:
-            select_socio = int(input(f"\nOlá Sr(a) {Account['nome']}, escolha o socio em que voce deseja aderir: "))
+    for index, socio in list(socios.items())[1:]:
+        if index == 1:
+            print(f"[{index}] {socio['nome']} - {socio['valor']}")
+        else:
+            print(f"[{index}] {socio['nome']} - R$ {socio['valor']}")
 
-            if select_socio >= 1 and select_socio < 5:
-                limparChat()
-                adquirirSocio(select_socio)
-            else:
-                limparChat()
-                print("Por favor digite um numero valido ['1' a '4']")
+    print("[0] Voltar")
+    print("=" * 40)
 
-        except ValueError:
+    try:
+        select_socio = int(input(f"\nOlá Sr(a) {Account['nome']}, escolha o socio em que voce deseja aderir: "))
+
+        if select_socio == 0:
             limparChat()
-            print("Por favor digite apenas numeros.")
+            menu_atual = 4
+            return
+
+        if 1 <= select_socio < 5:
+            limparChat()
+            adquirirSocio(select_socio)
+        else:
+            limparChat()
+            print("Por favor digite um numero valido ['1' a '4'].")
+
+    except ValueError:
+        limparChat()
+        print("Por favor digite apenas numeros.")
+
+
+def confirmarTrocaPlano(novo_socio):
+    socio_atual = Account["socio"]
+
+    if socio_atual == 0:
+        return True
+
+    if socio_atual == novo_socio:
+        print(f"Voce ja possui o plano {socios[socio_atual]['nome']}.")
+        return False
+
+    print(f"Voce ja possui o plano {socios[socio_atual]['nome']}.")
+    print(f"Deseja trocar para o plano {socios[novo_socio]['nome']}?")
+    print("[1] Sim")
+    print("[2] Nao")
+
+    try:
+        escolha = int(input("Escolha uma opcao: "))
+
+        if escolha == 1:
+            return True
+
+        print("Troca de plano cancelada.")
+        return False
+
+    except ValueError:
+        print("Opcao invalida. Troca de plano cancelada.")
+        return False
 
 
 def adquirirSocio(socio):
     global Account
     global menu_atual
+
+    if not confirmarTrocaPlano(socio):
+        menu_atual = 4
+        return
 
     if socio == 1:
         if float(Account["renda"]) > 1518.0:
@@ -299,7 +378,162 @@ def adquirirSocio(socio):
     salvarContaAtualizada()
 
     menu_atual = 4
+    
+# SISTEMA DE INGRESSOS
+def carregarJogos():
+    try:
+        with open(CAMINHO_JOGOS, "r", encoding="utf-8") as arquivo:
+            return json.load(arquivo)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
 
+
+def buscarJogoPorId(jogos, id_jogo):
+    for jogo in jogos:
+        if jogo["id"] == id_jogo:
+            return jogo
+
+    return None
+
+def buscarSetorPorId(jogo, id_setor):
+    for setor in jogo["setores"]:
+        if setor["id"] == id_setor:
+            return setor
+
+    return None
+
+def createCompraIngresso():
+    global Account
+    global menu_atual
+
+    if len(Account) == 0:
+        print("Erro: voce precisa estar logado.")
+        menu_atual = 0
+        return
+
+    jogos = carregarJogos()
+
+    if len(jogos) == 0:
+        print("Nenhum jogo disponivel no momento.")
+        menu_atual = 4
+        return
+
+    print(f"{'=' * 20} [Comprar Ingressos] {'=' * 20}")
+
+    for jogo in jogos:
+        print("-" * 40)
+        print(f"[{jogo['id']}] Ponte Preta x {jogo['adversario']}")
+        print(f"Data: {jogo['data']} às {jogo['horario']}")
+        print(f"Estádio: {jogo['estadio']}")
+        print("-" * 40)
+
+    print("[0] Voltar")
+    print("=" * 40)
+
+    try:
+        select_jogo = int(input("Escolha o jogo: "))
+
+        if(select_jogo == 0):
+            limparChat()
+            menu_atual = 4
+            return
+
+        jogo = buscarJogoPorId(jogos, select_jogo)
+
+        if(jogo == None):
+            limparChat()
+            print("Erro: Jogo invalido.")
+            menu_atual = 4
+            return
+
+        limparChat()
+
+        print(f"{'=' * 20} [Escolha o Setor] {'=' * 20}")
+        print(f"Jogo: Ponte Preta x {jogo['adversario']}")
+        print(f"Data: {jogo['data']} às {jogo['horario']}")
+        print(f"Estádio: {jogo['estadio']}")
+        print("=" * 40)
+
+        for setor in jogo["setores"]:
+            print(f"[{setor['id']}] {setor['nome']}")
+            print(f"{setor['tipo']}")
+            print(f"R$ {setor['valor']:.2f}")
+            print("-" * 40)
+
+        print("[0] Voltar")
+        print("=" * 40)
+
+        select_setor = int(input("Escolha o setor: "))
+
+        if(select_setor == 0):
+            limparChat()
+            menu_atual = 4
+            return
+
+        setor = buscarSetorPorId(jogo, select_setor)
+
+        if(setor == None):
+            limparChat()
+            print("Erro: Setor invalido.")
+            menu_atual = 4
+            return
+
+        socio = Account["socio"]
+        desconto = socios[socio]["desconto"]
+
+        valor_original = setor["valor"]
+        valor_desconto = valor_original * desconto / 100
+        valor_final = valor_original - valor_desconto
+
+        limparChat()
+
+        print(f"{'=' * 20} [Resumo da Compra] {'=' * 20}")
+        print(f"Jogo: Ponte Preta x {jogo['adversario']}")
+        print(f"Data: {jogo['data']} às {jogo['horario']}")
+        print(f"Estádio: {jogo['estadio']}")
+        print(f"Setor: {setor['nome']}")
+        print(f"Tipo: {setor['tipo']}")
+        print(f"Plano atual: {socios[socio]['nome']}")
+        print(f"Valor original: R$ {valor_original:.2f}")
+        print(f"Desconto: {desconto}%")
+        print(f"Valor final: R$ {valor_final:.2f}")
+        print("=" * 40)
+
+        confirmar_compra = input("Deseja confirmar a compra? [s/n]: ").lower()
+
+        if(confirmar_compra == "s"):
+            ingresso = {
+                "jogo_id": jogo["id"],
+                "jogo": f"Ponte Preta x {jogo['adversario']}",
+                "data": jogo["data"],
+                "horario": jogo["horario"],
+                "estadio": jogo["estadio"],
+                "setor": setor["nome"],
+                "tipo": setor["tipo"],
+                "valor_original": valor_original,
+                "desconto": desconto,
+                "valor_pago": valor_final
+            }
+
+            if "ingressos" not in Account:
+                Account["ingressos"] = []
+
+            Account["ingressos"].append(ingresso)
+            salvarContaAtualizada()
+
+            limparChat()
+            print("Ingresso comprado com sucesso!")
+
+        else:
+            limparChat()
+            print("Compra cancelada.")
+
+        menu_atual = 4
+
+    except ValueError:
+        limparChat()
+        print("Digite apenas numeros.")
+        menu_atual = 4
 
 while menu_atual != -1:
     match menu_atual:
@@ -318,8 +552,18 @@ while menu_atual != -1:
         case 4:
             createMenu("Digite o menu em que voce deseja ir: ", 5, 9)
 
+        case 5:
+            limparChat()
+            createCompraIngresso()
+            menu_atual = 4
+
+        case 6:
+            limparChat()
+            print("Sistema de meus ingressos ainda nao implementado.")
+            menu_atual = 4
+
         case 7:
             createMenuSocios()
 
         case 8:
-            break
+            sairSistema()
