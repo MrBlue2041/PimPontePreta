@@ -12,6 +12,7 @@ menus = [
     "Comprar Ingressos",
     "Meus Ingressos",
     "Seja Sócio",
+    "Carteirinha Digital",
     "Sair"
 ]
 
@@ -628,6 +629,35 @@ def createMeusIngressos():
         limparChat()
         print("Digite apenas numeros.")
         menu_atual = 4
+        
+def showCarteirinhaDigital():
+    global Account
+    global menu_atual
+
+    if len(Account) == 0:
+        print("Erro: voce precisa estar logado.")
+        menu_atual = 0
+        return
+
+    socio = Account["socio"]
+    socio_nome = socios[socio]["nome"]
+    mensalidade = "Em dia" if Account["mensalidade_paga"] == True else "Em atraso"
+
+    identificacao = f"PP-{Account['cpf'][-4:]}-{Account['cpf'][0]}"
+
+    print("=" * 45)
+    print("           CARTEIRINHA DIGITAL")
+    print("=" * 45)
+    print(f"Nome: {Account['nome']}")
+    print(f"CPF: ***.***.***-{Account['cpf'][-2:]}")
+    print(f"Categoria do plano: {socio_nome}")
+    print(f"Situação da mensalidade: {mensalidade}")
+    print(f"Identificação digital: {identificacao}")
+    print("=" * 45)
+
+    input("Pressione ENTER para voltar...")
+    limparChat()
+    menu_atual = 4
 
 while menu_atual != -1:
     match menu_atual:
@@ -658,4 +688,6 @@ while menu_atual != -1:
             createMenuSocios()
 
         case 8:
+            showCarteirinhaDigital()
+        case 9:
             sairSistema()
