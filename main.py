@@ -7,7 +7,6 @@ menus = [
     "PONTE PRETA",
     "Cadastro",
     "Login",
-    "Sair",
     "Pagina Inicial",
     "Comprar Ingressos",
     "Meus Ingressos",
@@ -30,6 +29,11 @@ menu_atual = 0
 
 def limparChat():
     print("\n" * 40)
+
+
+def pausar(texto="Pressione ENTER para continuar..."):
+    input(f"\n{texto}")
+    limparChat()
 
 
 def carregarUsuarios():
@@ -90,7 +94,7 @@ def createMenu(text, inicio, final):
 
     print(f"{'=' * 20} [{menus[menu_atual]}] {'=' * 20}")
 
-    if menu_atual == 4 and len(Account) != 0:
+    if menu_atual == 3 and len(Account) != 0:
         print(f"\nOlá Sr(a) {Account['nome']}, seja bem vindo Ponte Pretano.\n")
         mostrarPlanoAtual()
 
@@ -112,6 +116,7 @@ def createMenu(text, inicio, final):
     except ValueError:
         limparChat()
         print("Por favor digite apenas numeros.")
+        pausar()
 
 
 def createAcesso(login):
@@ -131,8 +136,10 @@ def createAcesso(login):
                             login_etapa += 1
                         else:
                             print("Erro: Esse CPF nao esta cadastrado.")
+                            pausar("Pressione ENTER para tentar novamente...")
                     else:
                         print("Erro: CPF invalido.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
                 case 1:
                     senha = input("Digite sua senha: ")
@@ -142,16 +149,19 @@ def createAcesso(login):
 
                         if not Account:
                             print("Erro: Nao foi possivel carregar a conta, tente novamente.")
+                            pausar("Pressione ENTER para tentar novamente...")
                         else:
                             if Account["mensalidade_paga"] == False:
                                 print("Erro: Acesso negado, voce deve pagar sua mensalidade que esta em atraso.")
+                                pausar()
                                 return
 
-                            menu_atual = 4
+                            menu_atual = 3
                             limparChat()
                             break
                     else:
                         print("Erro: Senha incorreta.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
     else:
         cadastro_etapa = 0
@@ -170,8 +180,10 @@ def createAcesso(login):
                             cadastro_etapa += 1
                         else:
                             print("Erro: Esse email ja esta em uso.")
+                            pausar("Pressione ENTER para tentar novamente...")
                     else:
                         print("Erro: Email invalido.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
                 case 2:
                     cpf = input("Digite seu CPF: ")
@@ -181,8 +193,10 @@ def createAcesso(login):
                             cadastro_etapa += 1
                         else:
                             print("Erro: Esse CPF ja esta em uso.")
+                            pausar("Pressione ENTER para tentar novamente...")
                     else:
                         print("Erro: CPF invalido.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
                 case 3:
                     data = input("Digite sua data de nascimento: ")
@@ -191,6 +205,7 @@ def createAcesso(login):
                         cadastro_etapa += 1
                     else:
                         print("Erro: Data de nascimento invalida.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
                 case 4:
                     try:
@@ -198,6 +213,7 @@ def createAcesso(login):
                         cadastro_etapa += 1
                     except ValueError:
                         print("Erro: Digite apenas numeros.")
+                        pausar("Pressione ENTER para tentar novamente...")
 
                 case 5:
                     senha = input("Digite sua senha: ")
@@ -205,18 +221,22 @@ def createAcesso(login):
 
                     if len(senha) < 8:
                         print("Erro: Minimo 8 caracteres.")
+                        pausar("Pressione ENTER para tentar novamente...")
                     elif senha != confirmar_senha:
                         print("Erro: As senhas nao coincidem.")
+                        pausar("Pressione ENTER para tentar novamente...")
                     else:
                         cadastro_etapa += 1
 
                 case 6:
                     if novoUsuario(nome, email, cpf, data, renda, senha):
                         print("Cadastro realizado com sucesso!")
-                        createMenu("Digite o menu em que voce deseja ir: ", 1, 3)
+                        pausar()
+                        menu_atual = 0
                         break
                     else:
                         print("Erro: Realize o cadastro novamente!")
+                        pausar()
                         cadastro_etapa = 0
 
 
@@ -284,6 +304,7 @@ def createMenuSocios():
 
     if len(Account) == 0:
         print("Erro: voce precisa estar logado.")
+        pausar()
         menu_atual = 0
         return
 
@@ -305,7 +326,7 @@ def createMenuSocios():
 
         if select_socio == 0:
             limparChat()
-            menu_atual = 4
+            menu_atual = 3
             return
 
         if 1 <= select_socio < 5:
@@ -314,10 +335,12 @@ def createMenuSocios():
         else:
             limparChat()
             print("Por favor digite um numero valido ['1' a '4'].")
+            pausar()
 
     except ValueError:
         limparChat()
         print("Por favor digite apenas numeros.")
+        pausar()
 
 
 def confirmarTrocaPlano(novo_socio):
@@ -328,6 +351,7 @@ def confirmarTrocaPlano(novo_socio):
 
     if socio_atual == novo_socio:
         print(f"Voce ja possui o plano {socios[socio_atual]['nome']}.")
+        pausar()
         return False
 
     print(f"Voce ja possui o plano {socios[socio_atual]['nome']}.")
@@ -342,10 +366,12 @@ def confirmarTrocaPlano(novo_socio):
             return True
 
         print("Troca de plano cancelada.")
+        pausar()
         return False
 
     except ValueError:
         print("Opcao invalida. Troca de plano cancelada.")
+        pausar()
         return False
 
 
@@ -354,13 +380,14 @@ def adquirirSocio(socio):
     global menu_atual
 
     if not confirmarTrocaPlano(socio):
-        menu_atual = 4
+        menu_atual = 3
         return
 
     if socio == 1:
         if float(Account["renda"]) > 1518.0:
             print("Erro: sua renda ultrapassa o limite permitido para o Plano Social.")
-            menu_atual = 4
+            pausar()
+            menu_atual = 3
             return
 
     print(f"{'=' * 20} [{menus[menu_atual]}] {'=' * 20}")
@@ -372,13 +399,14 @@ def adquirirSocio(socio):
         print("Obrigado por apoiar nosso time.")
 
     print("=" * 40)
+    pausar("Pressione ENTER para voltar...")
 
     Account["socio"] = socio
     Account["mensalidade_paga"] = True
 
     salvarContaAtualizada()
 
-    menu_atual = 4
+    menu_atual = 3
     
 # SISTEMA DE INGRESSOS
 def carregarJogos():
@@ -412,6 +440,7 @@ def createCompraIngresso():
 
     if len(Account) == 0:
         print("Erro: voce precisa estar logado.")
+        pausar()
         menu_atual = 0
         return
 
@@ -419,7 +448,8 @@ def createCompraIngresso():
 
     if len(jogos) == 0:
         print("Nenhum jogo disponivel no momento.")
-        menu_atual = 4
+        pausar()
+        menu_atual = 3
         return
 
     print(f"{'=' * 20} [Comprar Ingressos] {'=' * 20}")
@@ -439,7 +469,7 @@ def createCompraIngresso():
 
         if(select_jogo == 0):
             limparChat()
-            menu_atual = 4
+            menu_atual = 3
             return
 
         jogo = buscarJogoPorId(jogos, select_jogo)
@@ -447,7 +477,8 @@ def createCompraIngresso():
         if(jogo == None):
             limparChat()
             print("Erro: Jogo invalido.")
-            menu_atual = 4
+            pausar()
+            menu_atual = 3
             return
 
         limparChat()
@@ -471,7 +502,7 @@ def createCompraIngresso():
 
         if(select_setor == 0):
             limparChat()
-            menu_atual = 4
+            menu_atual = 3
             return
 
         setor = buscarSetorPorId(jogo, select_setor)
@@ -479,7 +510,8 @@ def createCompraIngresso():
         if(setor == None):
             limparChat()
             print("Erro: Setor invalido.")
-            menu_atual = 4
+            pausar()
+            menu_atual = 3
             return
 
         socio = Account["socio"]
@@ -529,17 +561,20 @@ def createCompraIngresso():
             limparChat()
             print("Ingresso comprado com sucesso!")
             mostrarTicket(ingresso)
+            pausar()
 
         else:
             limparChat()
             print("Compra cancelada.")
+            pausar()
 
-        menu_atual = 4
+        menu_atual = 3
 
     except ValueError:
         limparChat()
         print("Digite apenas numeros.")
-        menu_atual = 4
+        pausar()
+        menu_atual = 3
 
 def mostrarTicket(ingresso):
     status = "Validado" if ingresso.get("validado") == True else "Nao validado"
@@ -560,12 +595,14 @@ def createMeusIngressos():
 
     if len(Account) == 0:
         print("Erro: voce precisa estar logado.")
+        pausar()
         menu_atual = 0
         return
 
     if "ingressos" not in Account or len(Account["ingressos"]) == 0:
         print("Voce ainda nao possui ingressos.")
-        menu_atual = 4
+        pausar()
+        menu_atual = 3
         return
 
     print(f"{'=' * 20} [Meus Ingressos] {'=' * 20}")
@@ -586,7 +623,7 @@ def createMeusIngressos():
 
         if(select_ingresso == 0):
             limparChat()
-            menu_atual = 4
+            menu_atual = 3
             return
 
         index_ingresso = select_ingresso - 1
@@ -594,7 +631,8 @@ def createMeusIngressos():
         if(index_ingresso < 0 or index_ingresso >= len(Account["ingressos"])):
             limparChat()
             print("Erro: Ingresso invalido.")
-            menu_atual = 4
+            pausar()
+            menu_atual = 3
             return
 
         ingresso = Account["ingressos"][index_ingresso]
@@ -602,7 +640,8 @@ def createMeusIngressos():
         if(ingresso.get("validado") == True):
             limparChat()
             print("Erro: Este ingresso ja foi validado anteriormente.")
-            menu_atual = 4
+            pausar()
+            menu_atual = 3
             return
 
         print(f"{'=' * 20} [Validar Entrada] {'=' * 20}")
@@ -619,16 +658,19 @@ def createMeusIngressos():
 
             limparChat()
             print("Entrada validada com sucesso!")
+            pausar()
         else:
             limparChat()
             print("Validacao cancelada.")
+            pausar()
 
-        menu_atual = 4
+        menu_atual = 3
 
     except ValueError:
         limparChat()
         print("Digite apenas numeros.")
-        menu_atual = 4
+        pausar()
+        menu_atual = 3
         
 def showCarteirinhaDigital():
     global Account
@@ -636,6 +678,7 @@ def showCarteirinhaDigital():
 
     if len(Account) == 0:
         print("Erro: voce precisa estar logado.")
+        pausar()
         menu_atual = 0
         return
 
@@ -655,14 +698,13 @@ def showCarteirinhaDigital():
     print(f"Identificação digital: {identificacao}")
     print("=" * 45)
 
-    input("Pressione ENTER para voltar...")
-    limparChat()
-    menu_atual = 4
+    pausar("Pressione ENTER para voltar...")
+    menu_atual = 3
 
 while menu_atual != -1:
     match menu_atual:
         case 0:
-            createMenu("Digite o menu em que voce deseja ir: ", 1, 4)
+            createMenu("Digite o menu em que voce deseja ir: ", 1, 3)
 
         case 1:
             createAcesso(False)
@@ -671,23 +713,22 @@ while menu_atual != -1:
             createAcesso(True)
 
         case 3:
-            sairSistema()
+            createMenu("Digite o menu em que voce deseja ir: ", 4, 9)
 
         case 4:
-            createMenu("Digite o menu em que voce deseja ir: ", 5, 9)
-
-        case 5:
             limparChat()
             createCompraIngresso()
 
-        case 6:
+        case 5:
             limparChat()
             createMeusIngressos()
 
-        case 7:
+        case 6:
+            limparChat()
             createMenuSocios()
 
-        case 8:
+        case 7:
+            limparChat()
             showCarteirinhaDigital()
-        case 9:
+        case 8:
             sairSistema()
