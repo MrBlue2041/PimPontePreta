@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "adversario": "Testee",
+        "adversario": "Comercial",
         "data": "20/06/2026",
         "horario": "19:00",
         "estadio": "Estádio Moisés Lucarelli",
@@ -22,13 +22,13 @@
                 "id": 3,
                 "nome": "Vip Ponte Preta",
                 "tipo": "Setor Camarote",
-                "valor": 60.0
+                "valor": 120.0
             }
         ]
     },
     {
         "id": 2,
-        "adversario": "Testee",
+        "adversario": "Botafogo SP",
         "data": "20/06/2026",
         "horario": "19:00",
         "estadio": "Estádio Moisés Lucarelli",
@@ -49,7 +49,7 @@
                 "id": 3,
                 "nome": "Vip Ponte Preta",
                 "tipo": "Setor Camarote",
-                "valor": 60.0
+                "valor": 120.0
             }
         ]
     }

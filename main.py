@@ -516,10 +516,9 @@ def createCompraIngresso():
 
         socio = Account["socio"]
         desconto = socios[socio]["desconto"]
-
         valor_original = setor["valor"]
-        valor_desconto = valor_original * desconto / 100
-        valor_final = calcularValorIngresso(valor_original, valor_desconto)
+        
+        valor_final = calcularValorIngresso(valor_original, desconto)
 
         limparChat()
 
