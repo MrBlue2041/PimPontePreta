@@ -1,7 +1,7 @@
 import json
 
-CAMINHO_USUARIOS = "dados/usuarios.json"
-CAMINHO_JOGOS = "dados/jogos.json"
+CAMINHO_USUARIOS = "./dados/usuarios.json"
+CAMINHO_JOGOS = "./dados/jogos.json"
 
 menus = [
     "PONTE PRETA",
@@ -40,6 +40,7 @@ def carregarUsuarios():
     try:
         with open(CAMINHO_USUARIOS, "r", encoding="utf-8") as arquivo:
             return json.load(arquivo)
+        
     except (FileNotFoundError, json.JSONDecodeError):
         return []
 
@@ -75,6 +76,7 @@ def mostrarPlanoAtual():
 
     if plano_id != 0:
         print(f"Mensalidade paga: {'Sim' if Account['mensalidade_paga'] else 'Não'}")
+        
 
     print()
 
