@@ -12,7 +12,7 @@ O sistema simula um gerenciamento de sócio torcedor da Ponte Preta, permitindo 
 - Sistema de sócios
 - Carteirinha digital
 - Salvamento de dados em JSON
-- 
+  
 ## Tecnologias usadas
 - Python
 - JSON
