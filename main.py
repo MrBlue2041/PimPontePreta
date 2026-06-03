@@ -55,8 +55,8 @@ def salvarContaAtualizada():
 
     usuarios = carregarUsuarios()
 
-    for i, usuario in enumerate(usuarios):
-        if usuario["cpf"] == Account["cpf"]:
+    for i in range(len(usuarios)):
+        if usuarios[i]["cpf"] == Account["cpf"]:
             usuarios[i] = Account
             salvarUsuarios(usuarios)
             return True
